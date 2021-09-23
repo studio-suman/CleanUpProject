@@ -203,7 +203,7 @@ namespace CleanUpProject
         }
 
 
-        public float DisplayInfo()
+        public float DisplayInfo() //Displaying Information on the Panel
         {
 
             string rootDrive = Path.GetPathRoot(Environment.SystemDirectory); // for getting primary drive 
