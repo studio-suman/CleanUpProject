@@ -59,7 +59,7 @@ namespace CleanUpProject
                 System.IO.DirectoryInfo di = new DirectoryInfo(System.IO.Path.GetTempPath());
                 ClearTempData(di);
 
-                //Delete RecycleBin
+                //Delete RecycleBin Calling Shell32 Dll for clearing Recycle Bin
                 uint result = SHEmptyRecycleBin(IntPtr.Zero, null, 0);
 
             }
