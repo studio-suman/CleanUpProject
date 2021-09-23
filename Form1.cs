@@ -55,8 +55,25 @@ namespace CleanUpProject
             if (WinChkbox.Checked)
             {
 
-                //Delete temporary folder
-                System.IO.DirectoryInfo di = new DirectoryInfo(System.IO.Path.GetTempPath());
+                /*
+                @echo off
+                del / s / f / q % windir %\temp\*.*
+                rd / s / q % windir %\temp
+                md % windir %\temp
+                del / s / f / q % windir %\Prefetch\*.*
+                rd / s / q % windir %\Prefetch
+                md % windir %\Prefetch
+                del / s / f / q % windir %\system32\dllcache\*.*
+                rd / s / q % windir %\system32\dllcache
+                md % windir %\system32\dllcache
+                del / s / f / q "%SysteDrive%\Temp"\*.*
+                rd / s / q "%SysteDrive%\Temp"
+                md "%SysteDrive%\Temp"
+                del / s / f / q % temp %\*.*
+                rd / s / q % temp %
+                */
+                     //Delete temporary folder
+                     System.IO.DirectoryInfo di = new DirectoryInfo(System.IO.Path.GetTempPath());
                 ClearTempData(di);
 
                 //Delete RecycleBin Calling Shell32 Dll for clearing Recycle Bin
@@ -272,5 +289,9 @@ namespace CleanUpProject
                 return false;
         }
 
+        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            System.Diagnostics.Process.Start("chrome", "https://github.com/studio-suman/CleanUpProject/tree/master#readme");
+        }
     }
 }
