@@ -26,7 +26,7 @@ namespace CleanUpProject
             label3.Text = DisplayInfo().ToString() + " MB";
         }
 
-        enum browser : int
+        enum browser : int          //Browser Enum
         {
 
             Chrome,
@@ -73,7 +73,7 @@ namespace CleanUpProject
             MessageBox.Show(message, title);
         }
 
-        [DllImport("Shell32.dll", CharSet = CharSet.Unicode)]
+        [DllImport("Shell32.dll", CharSet = CharSet.Unicode)] //Dll Import
 
         static extern uint SHEmptyRecycleBin(IntPtr hwnd, string pszRootPath, RecycleFlags dwFlags);
 
