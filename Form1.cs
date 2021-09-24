@@ -14,7 +14,7 @@ using System.Windows.Forms;
 
 namespace CleanUpProject
 {
-
+    //File.Copy(Application.ExecutablePath, @"D:\Temp\myFile.EXE");
 
 
     public partial class Form1 : Form
@@ -22,6 +22,7 @@ namespace CleanUpProject
         public Form1()
         {
             InitializeComponent();
+
             label3.Visible = true;
             label3.Text = DisplayInfo().ToString() + " MB";
         }
@@ -35,9 +36,12 @@ namespace CleanUpProject
             FireFox,
         }
 
+
+
         private void cleanbtn_Click(object sender, EventArgs e)
         {
 
+            this.listBox1.Items.Clear();
             if (ChromeChkbox.Checked)
             {
 
@@ -54,7 +58,7 @@ namespace CleanUpProject
 
             if (WinChkbox.Checked)
             {
-
+                
                 /*
                 @echo off
                 del / s / f / q % windir %\temp\*.*
@@ -73,8 +77,12 @@ namespace CleanUpProject
                 rd / s / q % temp %
                 */
                      //Delete temporary folder
-                     System.IO.DirectoryInfo di = new DirectoryInfo(System.IO.Path.GetTempPath());
+                DirectoryInfo di = new DirectoryInfo(Path.GetTempPath());
                 ClearTempData(di);
+
+                string s = Path.GetPathRoot(Environment.SystemDirectory) + "Windows\\temp\\";
+                DirectoryInfo to = new DirectoryInfo(s);
+                ClearTempData(to);
 
                 //Delete RecycleBin Calling Shell32 Dll for clearing Recycle Bin
                 uint result = SHEmptyRecycleBin(IntPtr.Zero, null, 0);
@@ -101,7 +109,7 @@ namespace CleanUpProject
             SHERB_NOSOUND = 0x00000004
         }
 
-        public static void clearbrowsercache(int browser)
+        public void clearbrowsercache(int browser)
         {
 
             string rootDrive = Path.GetPathRoot(Environment.SystemDirectory); // for getting primary drive 
@@ -110,10 +118,10 @@ namespace CleanUpProject
             switch (browser)
             {
 
-                case 1 :
+                case 0 :
 
                     //For internet explorer
-                    System.Diagnostics.Process.Start("rundll32.exe", "InetCpl.cpl,ClearMyTracksByProcess 255");
+                    Process.Start("rundll32.exe", "InetCpl.cpl,ClearMyTracksByProcess 255");
 
                     // for Google Chrome.
 
@@ -134,7 +142,7 @@ namespace CleanUpProject
                         }
 
 
-                        System.IO.DirectoryInfo downloadedMessageInfo = new DirectoryInfo(rootDrive + "Users\\" + userName + "\\AppData\\Local\\Google\\Chrome\\User Data\\Default");
+                        DirectoryInfo downloadedMessageInfo = new DirectoryInfo(rootDrive + "Users\\" + userName + "\\AppData\\Local\\Google\\Chrome\\User Data\\Default");
 
 
                         try
@@ -151,7 +159,7 @@ namespace CleanUpProject
                     break;
 
 
-                case 2 :
+                case 1 :
 
                     // for Edge.
 
@@ -172,7 +180,7 @@ namespace CleanUpProject
                         }
 
 
-                        System.IO.DirectoryInfo dMinfo = new DirectoryInfo(rootDrive + "Users\\" + userName + "\\AppData\\Local\\Microsoft\\Edge\\User Data\\Default");
+                            DirectoryInfo dMinfo = new DirectoryInfo(rootDrive + "Users\\" + userName + "\\AppData\\Local\\Microsoft\\Edge\\User Data\\Default");
 
                         try
                         {
@@ -190,36 +198,50 @@ namespace CleanUpProject
 
         }
 
-        private static void ClearTempData(DirectoryInfo di)
+        public void ClearTempData(DirectoryInfo di)
         {
-            foreach (FileInfo file in di.GetFiles())
+            try
             {
-                try
+                foreach (FileInfo file in di.GetFiles())
                 {
-                    file.Delete();
-                    Console.WriteLine(file.FullName);
-                }
-                catch (Exception)
-                {
-                    continue;
-                }
-            }
+                    try
+                    {
+                        
+                        file.Delete();
+                        this.listBox1.Items.Add(file.FullName);
+                        Console.WriteLine(file.FullName);
+                    }
+                    catch (Exception ex)
+                    {
 
-            foreach (DirectoryInfo dir in di.GetDirectories())
+                        if (ex is UnauthorizedAccessException)
+                            continue;
+                        else
+                            continue;
+
+                    }
+                }
+
+                foreach (DirectoryInfo dir in di.GetDirectories())
+                {
+                    try
+                    {
+                        dir.Delete(true);
+                        this.listBox1.Items.Add(dir.FullName);
+                        Console.WriteLine(dir.FullName);
+                    }
+                    catch (Exception)
+                    {
+                        continue;
+                    }
+                }
+            } catch (Exception)
             {
-                try
-                {
-                    dir.Delete(true);
-                    Console.WriteLine(dir.FullName);
-                }
-                catch (Exception)
-                {
-                    continue;
-                }
+                this.listBox1.Items.Add(di);
             }
         }
 
-
+       
         public float DisplayInfo() //Displaying Information on the Panel
         {
 
@@ -229,7 +251,8 @@ namespace CleanUpProject
             float s = 0;
 
             string[] folderpath = { "C:\\Users\\" + userName + "\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\"
-                               ,System.IO.Path.GetTempPath()
+                               ,Path.GetTempPath()
+                               ,Path.GetPathRoot(Environment.SystemDirectory) + "Windows\\temp\\"
                                ,"C:\\Users\\" + userName + "\\AppData\\Local\\Microsoft\\Edge\\User Data\\Default"
                                ,"C:\\Users\\" + userName + "\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\History-journal"
                                ,"C:\\Users\\" + userName + "\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Cookies"
@@ -291,7 +314,7 @@ namespace CleanUpProject
 
         private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            System.Diagnostics.Process.Start("chrome", "https://github.com/studio-suman/CleanUpProject/tree/master#readme");
+            Process.Start("chrome", "https://github.com/studio-suman/CleanUpProject/tree/master#readme");
         }
     }
 }
