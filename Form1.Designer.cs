@@ -36,13 +36,13 @@ namespace CleanUpProject
             this.cleanbtn = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.listBox1 = new System.Windows.Forms.ListBox();
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.linkLabel1 = new System.Windows.Forms.LinkLabel();
-            this.listBox1 = new System.Windows.Forms.ListBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
@@ -121,6 +121,14 @@ namespace CleanUpProject
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Update";
             // 
+            // listBox1
+            // 
+            this.listBox1.FormattingEnabled = true;
+            this.listBox1.Location = new System.Drawing.Point(7, 46);
+            this.listBox1.Name = "listBox1";
+            this.listBox1.Size = new System.Drawing.Size(434, 69);
+            this.listBox1.TabIndex = 4;
+            // 
             // label4
             // 
             this.label4.AutoSize = true;
@@ -161,11 +169,11 @@ namespace CleanUpProject
             // 
             // pictureBox1
             // 
-            this.pictureBox1.Image = global::CleanUpProject.Properties.Resources.broom_icon;
+            this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
             this.pictureBox1.Location = new System.Drawing.Point(396, 12);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(77, 50);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox1.TabIndex = 6;
             this.pictureBox1.TabStop = false;
             // 
@@ -182,14 +190,6 @@ namespace CleanUpProject
             this.linkLabel1.Text = "About";
             this.linkLabel1.VisitedLinkColor = System.Drawing.Color.Black;
             this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
-            // 
-            // listBox1
-            // 
-            this.listBox1.FormattingEnabled = true;
-            this.listBox1.Location = new System.Drawing.Point(7, 46);
-            this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(434, 69);
-            this.listBox1.TabIndex = 4;
             // 
             // Form1
             // 
