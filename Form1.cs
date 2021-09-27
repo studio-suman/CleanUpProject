@@ -9,6 +9,8 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
+using System.Threading;
+using System.Threading.Tasks;
 
 
 
@@ -45,48 +47,23 @@ namespace CleanUpProject
             if (ChromeChkbox.Checked)
             {
 
-                clearbrowsercache((int)browser.Chrome);
+               Task chrome = new Task (() => Clearbrowsercache((int)browser.Chrome));
+                chrome.RunSynchronously();
 
             }
 
             if (EdgeChkbox.Checked)
             {
 
-                clearbrowsercache((int)browser.Edge);
-
+                Task edge = new Task (() => Clearbrowsercache((int)browser.Edge));
+                edge.RunSynchronously();
             }
 
             if (WinChkbox.Checked)
             {
-                
-                /*
-                @echo off
-                del / s / f / q % windir %\temp\*.*
-                rd / s / q % windir %\temp
-                md % windir %\temp
-                del / s / f / q % windir %\Prefetch\*.*
-                rd / s / q % windir %\Prefetch
-                md % windir %\Prefetch
-                del / s / f / q % windir %\system32\dllcache\*.*
-                rd / s / q % windir %\system32\dllcache
-                md % windir %\system32\dllcache
-                del / s / f / q "%SysteDrive%\Temp"\*.*
-                rd / s / q "%SysteDrive%\Temp"
-                md "%SysteDrive%\Temp"
-                del / s / f / q % temp %\*.*
-                rd / s / q % temp %
-                */
-                     //Delete temporary folder
-                DirectoryInfo di = new DirectoryInfo(Path.GetTempPath());
-                ClearTempData(di);
 
-                string s = Path.GetPathRoot(Environment.SystemDirectory) + "Windows\\temp\\";
-                DirectoryInfo to = new DirectoryInfo(s);
-                ClearTempData(to);
-
-                //Delete RecycleBin Calling Shell32 Dll for clearing Recycle Bin
-                uint result = SHEmptyRecycleBin(IntPtr.Zero, null, 0);
-
+                Task windows = new Task(() => WindowsCache());
+                windows.RunSynchronously();
             }
 
             label4.Visible = true;
@@ -96,6 +73,39 @@ namespace CleanUpProject
             string message = "Junk and Cache Cleared Succesfully";
             string title = "Confirmation";
             MessageBox.Show(message, title);
+        }
+
+        public void WindowsCache ()
+        {
+            /*
+               @echo off
+               del / s / f / q % windir %\temp\*.*
+               rd / s / q % windir %\temp
+               md % windir %\temp
+               del / s / f / q % windir %\Prefetch\*.*
+               rd / s / q % windir %\Prefetch
+               md % windir %\Prefetch
+               del / s / f / q % windir %\system32\dllcache\*.*
+               rd / s / q % windir %\system32\dllcache
+               md % windir %\system32\dllcache
+               del / s / f / q "%SysteDrive%\Temp"\*.*
+               rd / s / q "%SysteDrive%\Temp"
+               md "%SysteDrive%\Temp"
+               del / s / f / q % temp %\*.*
+               rd / s / q % temp %
+               */
+            //Delete temporary folder
+            DirectoryInfo di = new DirectoryInfo(Path.GetTempPath());
+            ClearTempData(di);
+
+            string s = Path.GetPathRoot(Environment.SystemDirectory) + "Windows\\temp\\";
+            DirectoryInfo to = new DirectoryInfo(s);
+            ClearTempData(to);
+
+            //Delete RecycleBin Calling Shell32 Dll for clearing Recycle Bin
+            uint result = SHEmptyRecycleBin(IntPtr.Zero, null, 0);
+
+
         }
 
         [DllImport("Shell32.dll", CharSet = CharSet.Unicode)] //Dll Import
@@ -109,7 +119,7 @@ namespace CleanUpProject
             SHERB_NOSOUND = 0x00000004
         }
 
-        public void clearbrowsercache(int browser)
+        public void Clearbrowsercache(int browser)
         {
 
             string rootDrive = Path.GetPathRoot(Environment.SystemDirectory); // for getting primary drive 
