@@ -4,8 +4,8 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using System.Threading.Tasks;
-
-
+using System.Threading;
+using System.Drawing;
 
 namespace CleanUpProject
 {
@@ -37,9 +37,8 @@ namespace CleanUpProject
             FireFox,
         }
 
-
-
-        private void cleanbtn_Click(object sender, EventArgs e)
+        
+        public void cleanbtn_Click(object sender, EventArgs e)
         {
 
             this.listBox1.Items.Clear();
@@ -47,8 +46,12 @@ namespace CleanUpProject
             {
 
                Task chrome = new Task (() => Clearbrowsercache((int)browser.Chrome));
+                //chrome.Start(TaskScheduler.FromCurrentSynchronizationContext());
                 chrome.RunSynchronously();
                 DisplayInfo(0);
+                Console.WriteLine("Chrome Task Started");
+                chrome.Wait();
+                Console.WriteLine("Chrome Task Completed");
 
             }
 
@@ -56,26 +59,39 @@ namespace CleanUpProject
             {
 
                 Task edge = new Task (() => Clearbrowsercache((int)browser.Edge));
+                //edge.Start(TaskScheduler.FromCurrentSynchronizationContext());
                 edge.RunSynchronously();
                 DisplayInfo(1);
+                Console.WriteLine("Edge Task Started");
+                edge.Wait();
+                Console.WriteLine("Edge Task Completed");
             }
 
             if (WinChkbox.Checked)
             {
 
                 Task windows = new Task(() => WindowsCache());
+                //windows.Start(TaskScheduler.FromCurrentSynchronizationContext());
                 windows.RunSynchronously();
                 DisplayInfo(2);
+                Console.WriteLine("Windows Action Task Started");
+                windows.Wait();
+                Console.WriteLine("Windows Action                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   Task Completed");
             }
 
-            ExecuteApplication("cleartemp.exe", "", cmd, true);
+            //Thread.Sleep(1000);
+            Task cmd = new Task(() => ExecuteApplication("cleartemp.exe", "", false));
+            cmd.Start();
+            cmd.Wait();
 
+            
+            
             label4.Visible = true;
             DisplayInfo(3);
             label4.Text = StringValue;
 
-            
 
+            Thread.Sleep(3000);
             //Confirmation Dialogue
             string message = "Junk and Cache Cleared Succesfully";
             string title = "Confirmation";
@@ -183,17 +199,23 @@ namespace CleanUpProject
                 {
                     try
                     {
-                        
-                        file.Delete();
-                        this.listBox1.Items.Add(file.FullName);
-                        Console.WriteLine(file.FullName);
+                        if (file.Name != "Bookmarks") { //Added logic for keeping Bookmarks
+                            file.Delete();
+                            this.listBox1.Items.Add(file.FullName);
+                            this.listBox1.ForeColor = Color.Green;
+                            Console.WriteLine(file.FullName);
+                        }
                     }
                     catch (Exception ex)
                     {
 
                         if (ex is UnauthorizedAccessException)
-                            continue;
+                        {
+                            this.listBox1.Items.Add(file.FullName);
+                            this.listBox1.ForeColor = Color.Red;
+                        }
                         else
+                            this.listBox1.Items.Add(file.FullName);
                             continue;
 
                     }
@@ -205,16 +227,20 @@ namespace CleanUpProject
                     {
                         dir.Delete(true);
                         this.listBox1.Items.Add(dir.FullName);
+                        this.listBox1.ForeColor = Color.Green;
                         Console.WriteLine(dir.FullName);
                     }
                     catch (Exception)
                     {
+                        this.listBox1.Items.Add(di);
+                        this.listBox1.ForeColor = Color.Red;
                         continue;
                     }
                 }
             } catch (Exception)
             {
                 this.listBox1.Items.Add(di);
+                this.listBox1.ForeColor = Color.Red;
             }
         }
 
@@ -286,6 +312,7 @@ namespace CleanUpProject
                                    ,"C:\\Users\\" + userName + "\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Cookies-journal"
             };
 
+            //Chrome size calculation
             string[] chromepath = { "C:\\Users\\" + userName + "\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\"
                                    ,"C:\\Users\\" + userName + "\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\History-journal"
                                    ,"C:\\Users\\" + userName + "\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Cookies"
@@ -295,12 +322,14 @@ namespace CleanUpProject
 
                 };
 
+            //Windows size calculation
             string[] winpath = { Path.GetTempPath()
                                    ,Path.GetPathRoot(Environment.SystemDirectory) + "Windows\\temp\\"
 
 
                 };
 
+            //Edge size calculation
             string[] edgepath = { "C:\\Users\\" + userName + "\\AppData\\Local\\Microsoft\\Edge\\\\User Data\\Default\\"
                                    , "C:\\Users\\" + userName + "\\AppData\\Local\\Microsoft\\Edge\\User Data\\Default"
                                    , "C:\\Users\\" + userName + "\\AppData\\Local\\Microsoft\\Edge\\Default\\History-journal"
@@ -340,9 +369,12 @@ namespace CleanUpProject
 
                         foreach (string name in files)
                         {
-                            var info = new FileInfo(name);
-                            totalSize += info.Length;
+                            if (name != "Bookmarks")
+                            {
+                                var info = new FileInfo(name);
+                                totalSize += info.Length;
 
+                            }
                         }
 
                         s = (float)totalSize / (1024 * 1024);
@@ -386,18 +418,17 @@ namespace CleanUpProject
             Process.Start("chrome", "https://github.com/studio-suman/CleanUpProject/tree/master#readme");
         }
 
-        public bool ExecuteApplication(string Address, string workingDir, string arguments, bool showWindow)
+        public bool ExecuteApplication(string Address, string workingDir, bool showWindow)
         {
             Process proc = new Process();
             proc.StartInfo.FileName = Address;
             proc.StartInfo.WorkingDirectory = workingDir;
-            proc.StartInfo.Arguments = arguments;
+            //proc.StartInfo.Arguments = arguments;
             proc.StartInfo.CreateNoWindow = showWindow;
             return proc.Start();
         }
 
-        string cmd = "";
-
+        //string cmd = "";
 
 
     }
